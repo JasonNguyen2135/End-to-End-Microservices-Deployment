@@ -21,7 +21,9 @@ jobs:
           java-version: '17'
 
       - name: Build backend
-        run: mvn clean package -DskipTests
+        run: |
+          cd spring-boot-app/admin-server
+          mvn clean package -DskipTests
 
       - name: Login Docker Hub
         uses: docker/login-action@v2
