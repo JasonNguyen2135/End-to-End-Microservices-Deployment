@@ -3,8 +3,6 @@ name: Frontend CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/frontend/**'
 
 jobs:
   build-and-push:

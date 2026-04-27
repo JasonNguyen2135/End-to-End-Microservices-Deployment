@@ -3,8 +3,6 @@ name: Notification Service CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/notification-service/**'
 
 jobs:
   build-and-push:

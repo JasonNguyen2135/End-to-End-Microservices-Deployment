@@ -3,8 +3,6 @@ name: Order Service CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/order-service/**'
 
 jobs:
   build-and-push:

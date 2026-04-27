@@ -3,8 +3,6 @@ name: API Gateway CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/api-gateway/**'
 
 jobs:
   build-and-push:
