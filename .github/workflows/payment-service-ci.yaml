@@ -3,8 +3,6 @@ name: Payment Service CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/payment-service/**'
 
 jobs:
   build-and-push:

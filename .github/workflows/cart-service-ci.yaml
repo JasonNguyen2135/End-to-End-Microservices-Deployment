@@ -3,8 +3,6 @@ name: Cart Service CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/cart-service/**'
 
 jobs:
   build-and-push:

@@ -3,8 +3,6 @@ name: Product Service CI
 on:
   push:
     branches: [ "main", "dev" ]
-    paths:
-      - 'spring-boot-app/product-service/**'
 
 jobs:
   build-and-push:
