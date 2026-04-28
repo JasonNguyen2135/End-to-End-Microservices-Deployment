@@ -54,7 +54,7 @@ jobs:
 
       - name: Build Docker image
         if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
-        run: docker build -t ${{ env.DOCKER_USERNAME }}/admin-server:${{ github.ref_name }} -t ${{ env.DOCKER_USERNAME }}/admin-server:${{ github.ref_name }}-${{ github.sha }} .
+        run: docker build -f Dockerfile -t ${{ env.DOCKER_USERNAME }}/admin-server:${{ github.ref_name }} -t ${{ env.DOCKER_USERNAME }}/admin-server:${{ github.ref_name }}-${{ github.sha }} ..
 
       - name: Run Trivy vulnerability scanner
         if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''

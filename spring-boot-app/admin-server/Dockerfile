@@ -1,15 +1,17 @@
 # Build stage
 FROM maven:3.9.9-eclipse-temurin-17 AS build
 
-WORKDIR /app
-COPY . .
+WORKDIR /workspace
+COPY pom.xml pom.xml
+COPY admin-server/pom.xml admin-server/pom.xml
+COPY admin-server/src admin-server/src
 
-RUN mvn clean package -DskipTests
+RUN mvn -f admin-server/pom.xml clean package -DskipTests
 
 # Run stage
 FROM amazoncorretto:17-alpine-jdk
 
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /workspace/admin-server/target/*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
