@@ -77,13 +77,40 @@ spec:
             - name: DB_USER
               value: keycloak
             - name: DB_PASSWORD
-              value: password
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: keycloak-db-password
             - name: KEYCLOAK_ADMIN
               value: admin
             - name: KEYCLOAK_ADMIN_PASSWORD
-              value: admin
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: keycloak-admin-password
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 15
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
           volumeMounts:
             - name: realm-config
               mountPath: /opt/keycloak/data/import/realm-export.json

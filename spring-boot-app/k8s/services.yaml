@@ -31,11 +31,33 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: discovery-server
           ports:
             - containerPort: 8761
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8761
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8761
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 ---
 apiVersion: v1
 kind: Service
@@ -73,7 +95,10 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: api-gateway
             - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
@@ -82,6 +107,25 @@ spec:
               value: http://keycloak:8080/realms/spring-boot-microservices-realm
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 150m
+              memory: 384Mi
+            limits:
+              cpu: 750m
+              memory: 768Mi
 ---
 apiVersion: v1
 kind: Service
@@ -127,13 +171,42 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: order-service
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://postgres-order:5431/order-service
+            - name: SPRING_DATASOURCE_USERNAME
+              value: ptechie
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: postgres-order-password
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 150m
+              memory: 384Mi
+            limits:
+              cpu: 750m
+              memory: 768Mi
 ---
 apiVersion: v1
 kind: Service
@@ -168,13 +241,42 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: inventory-service
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://postgres-inventory:5432/inventory-service
+            - name: SPRING_DATASOURCE_USERNAME
+              value: ptechie
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: postgres-inventory-password
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 150m
+              memory: 384Mi
+            limits:
+              cpu: 750m
+              memory: 768Mi
 ---
 apiVersion: v1
 kind: Service
@@ -209,11 +311,33 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: notification-service
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 ---
 apiVersion: v1
 kind: Service
@@ -248,8 +372,30 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: admin-server
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
