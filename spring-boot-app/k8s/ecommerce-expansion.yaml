@@ -31,13 +31,35 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: cart-service
             - name: SPRING_DATA_MONGODB_URI
               value: mongodb://mongo:27017/cart-service
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 ---
 apiVersion: v1
 kind: Service
@@ -72,14 +94,42 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: http://eureka:password@discovery-server:8761/eureka/
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: eureka-default-zone
             - name: EUREKA_INSTANCE_HOSTNAME
               value: payment-service
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: broker:9092
             - name: VNPAY_TMN_CODE
-              value: "G18S515I"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: vnpay-tmn-code
             - name: VNPAY_HASH_SECRET
-              value: "8VPOINLIUTBYIMFPUZSQFWRFHNJ99415"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: vnpay-hash-secret
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
