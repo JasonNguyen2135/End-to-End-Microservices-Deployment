@@ -77,6 +77,8 @@ services:
       - postgres
     ports:
       - "8181:8080"
+    volumes:
+      - ./realms:/tmp/realms:ro
     environment:
       DB_VENDOR: POSTGRES
       PROXY_ADDRESS_FORWARDING: "true"
@@ -89,6 +91,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: password
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/realms/realm-export.json
 
   zipkin:
     image: openzipkin/zipkin:3
@@ -191,6 +194,45 @@ services:
     ports:
       - "8082:8080"
 
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    image: ${DOCKER_USERNAME:-local}/payment-service:${IMAGE_TAG:-dev-local}
+    container_name: payment-service
+    depends_on:
+      - broker
+      - order-service
+      - discovery-server
+      - zipkin
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:password@discovery-server:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      VNPAY_TMN_CODE: DEMOVNPAY
+      VNPAY_HASH_SECRET: demo-vnpay-secret-local-only
+    ports:
+      - "8086:8080"
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    image: ${DOCKER_USERNAME:-local}/notification-service:${IMAGE_TAG:-dev-local}
+    container_name: notification-service
+    depends_on:
+      - broker
+      - discovery-server
+      - zipkin
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:password@discovery-server:8761/eureka/
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    ports:
+      - "8087:8080"
+
   api-gateway:
     build:
       context: .
@@ -203,6 +245,7 @@ services:
       - product-service
       - order-service
       - inventory-service
+      - payment-service
       - keycloak
       - zipkin
     environment:

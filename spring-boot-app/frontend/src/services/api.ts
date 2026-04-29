@@ -1,23 +1,23 @@
 import axios from 'axios';
-import { Product, OrderRequest } from '../types';
+import {
+    AdminOrder,
+    InventoryItem,
+    KeycloakUser,
+    OrderRequest,
+    OrderStats,
+    Product
+} from '../types';
 
 const getApiBaseUrl = () => {
-    const hostname = window.location.hostname;
-    // If we are on localhost, we use the NodePort 30085
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return 'http://localhost:30085';
-    }
-    // If we are on AWS or other cluster, we use the current hostname with the NodePort
-    return `http://${hostname}:30085`;
+    const configured = process.env.REACT_APP_API_BASE_URL;
+    if (configured) return configured;
+    return 'http://localhost:8085';
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
-const api = axios.create({
-    baseURL: API_BASE_URL,
-});
+const api = axios.create({ baseURL: API_BASE_URL });
 
-// Add a request interceptor to include the JWT token in the header
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -26,27 +26,72 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error?.response?.status === 401) {
+            const isAuthEndpoint = error.config?.url?.includes('/api/auth/');
+            if (!isAuthEndpoint) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
+                window.dispatchEvent(new Event('auth:logout'));
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const productService = {
     getAllProducts: () => api.get<Product[]>('/api/product'),
     createProduct: (product: Product) => api.post('/api/product', product),
-    deleteProduct: (id: string) => api.delete(`/api/product/${id}`),
+    updateProduct: (id: string, product: Product) => api.put<Product>(`/api/product/${id}`, product),
+    deleteProduct: (id: string) => api.delete(`/api/product/${id}`)
 };
 
 export const orderService = {
-    placeOrder: (order: OrderRequest) => api.post('/api/order', order),
+    placeOrder: (order: OrderRequest) => api.post<string>('/api/order', order),
+    getMyOrders: () => api.get<AdminOrder[]>('/api/order/me'),
+    getAdminOrders: () => api.get<AdminOrder[]>('/api/order/admin/all'),
+    updateOrderStatus: (orderNumber: string, status: string) =>
+        api.patch<AdminOrder>(`/api/order/admin/${orderNumber}/status`, { status }),
+    getStats: () => api.get<OrderStats>('/api/order/admin/stats')
 };
 
 export const cartService = {
-    getCart: (userId: string) => api.get(`/api/cart/${userId}`),
-    addToCart: (userId: string, item: any) => api.post(`/api/cart/${userId}/add`, item),
-    clearCart: (userId: string) => api.delete(`/api/cart/${userId}`),
+    getCart: () => api.get('/api/cart'),
+    addToCart: (item: any) => api.post('/api/cart/add', item),
+    clearCart: () => api.delete('/api/cart')
 };
 
 export const paymentService = {
-    createPayment: (paymentRequest: { orderId: string, amount: number, orderInfo: string }) => 
-        api.post('/api/payment/create', paymentRequest),
-    manualConfirm: (orderId: string) => 
-        api.post('/api/payment/manual-confirm', { orderId }),
+    createPayment: (paymentRequest: { orderId: string; amount: number; orderInfo: string; items?: any[] }) =>
+        api.post<string>('/api/payment/create', paymentRequest),
+    manualConfirm: (paymentRequest: { orderId: string; amount: number; orderInfo: string; items?: any[] }) =>
+        api.post('/api/payment/manual-confirm', paymentRequest)
+};
+
+export const inventoryService = {
+    listAll: () => api.get<InventoryItem[]>('/api/inventory/admin/all'),
+    updateQuantity: (skuCode: string, quantity: number) =>
+        api.put<InventoryItem>(`/api/inventory/admin/${skuCode}`, { quantity })
+};
+
+export const profileService = {
+    me: () => api.get<KeycloakUser>('/api/profile/me'),
+    update: (payload: Partial<KeycloakUser> & { address?: string; phone?: string }) =>
+        api.put<KeycloakUser>('/api/profile/me', payload)
+};
+
+export const adminUserService = {
+    list: () => api.get<KeycloakUser[]>('/api/admin/users'),
+    setEnabled: (id: string, enabled: boolean) =>
+        api.put(`/api/admin/users/${id}/enabled`, { enabled }),
+    resetPassword: (id: string, password: string) =>
+        api.post(`/api/admin/users/${id}/reset-password`, { password }),
+    grantAdmin: (id: string) => api.post(`/api/admin/users/${id}/grant-admin`)
 };
 
 export default api;
