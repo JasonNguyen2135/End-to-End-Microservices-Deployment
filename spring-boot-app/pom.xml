@@ -34,7 +34,6 @@
         <maven.compiler.target>17</maven.compiler.target>
         <spring-cloud.version>2023.0.2</spring-cloud.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-        <docker.image.prefix>registry.hub.docker.com/kaingyn615</docker.image.prefix>
     </properties>
 
     <dependencyManagement>
@@ -83,19 +82,6 @@
                             <version>0.2.0</version>
                         </path>
                     </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.3.2</version>
-                <configuration>
-                    <from>
-                        <image>eclipse-temurin:17.0.4.1_1-jre</image>
-                    </from>
-                    <to>
-                        <image>${docker.image.prefix}/${project.artifactId}:latest</image>
-                    </to>
                 </configuration>
             </plugin>
         </plugins>
