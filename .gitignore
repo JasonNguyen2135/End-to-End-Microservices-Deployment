@@ -21,6 +21,8 @@ crash.*.log
 # Bỏ qua các file biến môi trường chứa secret/password
 *.tfvars
 *.tfvars.json
+spring-boot-app/k8s/secrets.yaml
+spring-boot-app/k8s-staging/secrets.yaml
 
 # Bỏ qua file ghi đè cấu hình cục bộ
 override.tf

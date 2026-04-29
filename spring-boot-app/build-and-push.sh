@@ -1,52 +1,45 @@
 #!/bin/bash
+set -euo pipefail
 
-# USERNAME DOCKER HUB CỦA BẠN
-DOCKER_USERNAME="kaingyn615"
+DOCKER_USERNAME="${DOCKER_USERNAME:-kaingyn615}"
+IMAGE_TAG="${IMAGE_TAG:-main}"
 
-echo "Bắt đầu build và push images cho project Microservices (User: $DOCKER_USERNAME)..."
+echo "Bắt đầu build và push images bằng Dockerfile"
+echo "Docker Hub user: ${DOCKER_USERNAME}"
+echo "Image tag: ${IMAGE_TAG}"
 
-# Danh sách các microservices sử dụng Maven/Jib
-JAVA_SERVICES=("product-service" "order-service" "inventory-service" "notification-service" "api-gateway" "discovery-server" "admin-server" "cart-service" "payment-service")
+JAVA_SERVICES=(
+    "product-service"
+    "order-service"
+    "inventory-service"
+    "notification-service"
+    "api-gateway"
+    "discovery-server"
+    "admin-server"
+    "cart-service"
+    "payment-service"
+)
 
-for SERVICE in "${JAVA_SERVICES[@]}"
-do
+for SERVICE in "${JAVA_SERVICES[@]}"; do
+    IMAGE="${DOCKER_USERNAME}/${SERVICE}:${IMAGE_TAG}"
+
     echo "--------------------------------------------------------"
-    echo "Đang xử lý Java Service: $SERVICE"
+    echo "Build Java service: ${SERVICE}"
+    echo "Image: ${IMAGE}"
     echo "--------------------------------------------------------"
-    
-    cd $SERVICE
-    # 1. Build vào Docker local trước (tránh lỗi 401 của Jib)
-    mvn compile jib:dockerBuild
-    
-    if [ $? -eq 0 ]; then
-        # 2. Push thủ công bằng lệnh docker chuẩn
-        echo "Build thành công $SERVICE local. Đang đẩy lên Docker Hub..."
-        docker push $DOCKER_USERNAME/$SERVICE:latest
-        if [ $? -eq 0 ]; then
-            echo "Thành công: $SERVICE đã được push lên Docker Hub!"
-        else
-            echo "Lỗi: Không thể push $SERVICE bằng lệnh docker push."
-        fi
-    else
-        echo "Lỗi: Không thể build $SERVICE. Vui lòng kiểm tra log biên dịch."
-    fi
-    cd ..
+
+    docker build -f "${SERVICE}/Dockerfile" -t "${IMAGE}" .
+    docker push "${IMAGE}"
 done
 
-# Xử lý Frontend
+FRONTEND_IMAGE="${DOCKER_USERNAME}/frontend:${IMAGE_TAG}"
+
 echo "--------------------------------------------------------"
-echo "Đang xử lý Frontend Service"
+echo "Build frontend"
+echo "Image: ${FRONTEND_IMAGE}"
 echo "--------------------------------------------------------"
 
-cd frontend
-docker build -t $DOCKER_USERNAME/frontend:latest .
-docker push $DOCKER_USERNAME/frontend:latest
+docker build -t "${FRONTEND_IMAGE}" frontend
+docker push "${FRONTEND_IMAGE}"
 
-if [ $? -eq 0 ]; then
-    echo "Thành công: frontend đã được push lên Docker Hub!"
-else
-    echo "Lỗi: Không thể build/push frontend."
-fi
-cd ..
-
-echo "Tất cả các dịch vụ đã được xử lý xong!"
+echo "Hoàn tất build và push tất cả images."

@@ -4,82 +4,136 @@ Dự án này thực hiện tự động hóa hoàn toàn quy trình xây dựng
 
 ## 🛠 Công nghệ cốt lõi
 
-* **Cloud Provider:** AWS (Amazon Web Services).
-* **IaC:** Terraform (Quản lý EC2, VPC, Security Groups).
-* **Configuration Management:** Ansible & Kubespray.
-* **Orchestration:** Kubernetes v1.30+.
-* **Backend:** Spring Boot 3, Spring Cloud, Kafka, MongoDB, PostgreSQL.
-* **Frontend:** React (TypeScript), VietQR/VNPay Integration.
-* **Security:** Keycloak (OAuth2/OIDC).
+- **Cloud Provider:** AWS (Amazon Web Services).
+- **IaC:** Terraform (Quản lý EC2, VPC, Security Groups).
+- **Configuration Management:** Ansible & Kubespray.
+- **Orchestration:** Kubernetes v1.30+.
+- **Backend:** Spring Boot 3, Spring Cloud, Kafka, MongoDB, PostgreSQL.
+- **Frontend:** React (TypeScript), VietQR/VNPay Integration.
+- **Security:** Keycloak (OAuth2/OIDC).
 
 ---
 
 ## 🏗 Giai đoạn 1: Hạ tầng & Kubernetes
 
-Hạ tầng được triển khai trên AWS EC2 bằng Terraform và Kubespray.
+Hạ tầng được khởi tạo trên AWS EC2 bằng Terraform. File inventory cho cụm Kubernetes được sinh ra trong thư mục `inventory/mycluster`.
 
 ### 1. Khởi tạo hạ tầng với Terraform
+
 ```bash
 cd terraform
 terraform init
 terraform apply -auto-approve
 ```
 
-### 2. Triển khai cụm Kubernetes với Ansible
+### 2. Chuẩn bị cụm Kubernetes
+
+Repo đã có sẵn inventory cho cụm Kubernetes tại `inventory/mycluster/hosts.yaml`. Nếu dùng Kubespray, chạy playbook từ thư mục Kubespray riêng và trỏ về inventory này:
+
 ```bash
-cd kubespray
-ansible-playbook -i ../inventory/mycluster/hosts.yaml ... cluster.yml
+ansible-playbook -i ../inventory/mycluster/hosts.yaml cluster.yml
 ```
 
 ---
 
-## 📦 Giai đoạn 2: Triển khai Microservices (Spring Kafka App)
+## 📦 Giai đoạn 2: Build & Push Images
 
 Toàn bộ mã nguồn ứng dụng nằm trong thư mục `spring-boot-app`.
 
-### 1. Build và Push Image lên Docker Hub
-Hệ thống sử dụng Jib để đóng gói Image Java và Docker cho Frontend. Bạn cần đăng nhập Docker trước khi chạy script.
+Hệ thống thống nhất build image bằng `Dockerfile` cho toàn bộ backend services và frontend. Bạn cần đăng nhập Docker Hub trước khi chạy script.
 
 ```bash
 cd spring-boot-app
-# Đảm bảo file script có quyền thực thi và đúng định dạng Linux
-sed -i 's/\r$//' build-and-push.sh
 chmod +x build-and-push.sh
 
+# Mặc định push lên kaingyn615/<service>:main
 ./build-and-push.sh
+
+# Có thể override Docker Hub user hoặc tag nếu cần
+DOCKER_USERNAME=<docker-user> IMAGE_TAG=<tag> ./build-and-push.sh
 ```
 
-### 2. Triển khai lên cụm Kubernetes
-Chạy các lệnh apply theo thứ tự để đảm bảo hạ tầng sẵn sàng trước khi các app khởi chạy.
+Tag mặc định là `main` để khớp với `spring-boot-app/k8s/kustomization.yaml`.
+
+---
+
+## ☸️ Giai đoạn 3: Deploy Kubernetes
+
+Trước khi deploy, tạo Kubernetes Secret thật từ file mẫu. File `secrets.yaml` đã được `.gitignore` để tránh commit credential lên Git.
 
 ```bash
-cd spring-boot-app/k8s
+cp spring-boot-app/k8s/secret-example.yaml spring-boot-app/k8s/secrets.yaml
 
-# Tạo Namespace
-kubectl apply -f namespace.yaml
-
-# Triển khai Databases & Messaging (Mongo, Postgres, Kafka, MySQL)
-kubectl apply -f databases.yaml
-kubectl apply -f kafka-zipkin.yaml
-
-# Triển khai Bảo mật (Keycloak)
-kubectl apply -f keycloak.yaml
-
-# Triển khai Microservices & Frontend
-kubectl apply -f ecommerce-expansion.yaml
-kubectl apply -f services.yaml
-kubectl apply -f frontend.yaml
+# Chỉnh các giá trị change-me trong secrets.yaml trước khi apply
+kubectl apply -f spring-boot-app/k8s/namespace.yaml
+kubectl apply -f spring-boot-app/k8s/secrets.yaml
 ```
 
-### 3. Các tính năng chính của ứng dụng
-* **Storefront:** Giao diện mua sắm hiện đại, hiển thị tồn kho thời gian thực.
-* **Cart Service:** Quản lý giỏ hàng đồng bộ với danh mục sản phẩm.
-* **VNPay & VietQR:** Tích hợp thanh toán qua cổng VNPay Sandbox và tạo mã VietQR chuyển khoản nhanh.
-* **Inventory Control:** Chặn đặt hàng nếu vượt quá số lượng tồn kho, tự động trừ kho sau khi thanh toán thành công qua Kafka.
+Sau đó deploy toàn bộ manifest bằng Kustomize để Kubernetes dùng đúng image tag trong `spring-boot-app/k8s/kustomization.yaml`.
+
+```bash
+kubectl apply -k spring-boot-app/k8s
+```
+
+Kustomize sẽ apply các nhóm tài nguyên chính:
+
+- `namespace.yaml`
+- `databases.yaml`
+- `kafka-zipkin.yaml`
+- `keycloak.yaml`
+- `canary-rollouts.yaml`
+- `ecommerce-expansion.yaml`
+- `services.yaml`
+- `frontend.yaml`
+
+### Production-readiness đã bổ sung
+
+Các manifest Kubernetes đã được bổ sung những cấu hình giúp deployment gần với môi trường production hơn:
+
+- `PersistentVolumeClaim` cho MongoDB, PostgreSQL và MySQL để dữ liệu không mất khi Pod restart.
+- `readinessProbe` để Kubernetes chỉ route traffic đến Pod khi service đã sẵn sàng.
+- `livenessProbe` để Kubernetes tự restart Pod khi service bị treo.
+- `resources.requests` và `resources.limits` để kiểm soát CPU/RAM cho workload.
+- `valueFrom.secretKeyRef` để không hard-code password/VNPay secret trực tiếp trong Deployment manifest.
+
+---
+
+## 🔁 Giai đoạn 4: GitOps với ArgoCD
+
+ArgoCD Application đã được cấu hình trong thư mục `argocd`.
+
+Secret thật vẫn cần được tạo trong cluster trước khi ArgoCD sync application:
+
+```bash
+kubectl apply -f spring-boot-app/k8s/namespace.yaml
+kubectl apply -f spring-boot-app/k8s/secrets.yaml
+```
+
+```bash
+kubectl apply -f argocd/production-app.yaml
+```
+
+Application production trỏ đến:
+
+- `repoURL`: `https://github.com/davidmoi2135/End-to-End-Microservices-Deployment.git`
+- `path`: `spring-boot-app/k8s`
+- `targetRevision`: `main`
+
+Sau khi apply, ArgoCD sẽ đồng bộ manifest Kubernetes từ Git về cluster.
+
+---
+
+## 🧩 Các tính năng chính của ứng dụng
+
+- **Storefront:** Giao diện mua sắm hiện đại, hiển thị tồn kho thời gian thực.
+- **Cart Service:** Quản lý giỏ hàng đồng bộ với danh mục sản phẩm.
+- **VNPay & VietQR:** Tích hợp thanh toán qua cổng VNPay Sandbox và tạo mã VietQR chuyển khoản nhanh.
+- **Inventory Control:** Chặn đặt hàng nếu vượt quá số lượng tồn kho, tự động trừ kho sau khi thanh toán thành công qua Kafka.
 
 ---
 
 ## 🎯 Kết quả đạt được
+
 - [x] Hạ tầng AWS tự động hóa hoàn toàn.
 - [x] Cụm Kubernetes Production Ready.
 - [x] Hệ thống Microservices giao tiếp thông suốt qua Kafka và Service Discovery.
