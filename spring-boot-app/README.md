@@ -27,23 +27,36 @@ This repository contains a spring boot microservices application implemented usi
 - Monitoring via Grafana and Prometheus
 - Package and deploy using Docker and Kubernetes (later)
 
-### Steps to Run the Application
+### Steps to Build and Run the Application
 
-First, clone the repo as follows:
+This project standardizes container image builds with Dockerfiles. From the `spring-boot-app` directory, build and push all backend and frontend images with:
 
-`https://github.com/ENate/spring-kafka-microservices-app.git`,
+```bash
+chmod +x build-and-push.sh
+./build-and-push.sh
+```
 
-Assuming all the technology stack listed above are installed, change to the main directory and run as follows:
+By default, images are pushed as `kaingyn615/<service>:main`. You can override the registry user and tag:
 
-``` cd spring-kafka-microservices-app ``` and then do
+```bash
+DOCKER_USERNAME=<docker-user> IMAGE_TAG=<tag> ./build-and-push.sh
+```
 
-``` mvn spring-boot:run ```
+To run locally with Docker Compose:
 
-To run all services, we used the Google docker build API ``` jib``` and run the services using
+```bash
+docker-compose up -d
+```
 
- ` docker-compose.yaml` file using
+For Kubernetes deployment, create the real Secret from the committed example before applying the Kustomize overlay:
 
-`docker-compose up -d`
+```bash
+cp k8s/secret-example.yaml k8s/secrets.yaml
+# Update change-me values in k8s/secrets.yaml
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/secrets.yaml
+kubectl apply -k k8s
+```
 
 Next, run the following command to spin up keycloak and databases via docker-compose
 
@@ -58,11 +71,4 @@ Use any API platform (eg Postman, thunder client, Http etc) to perform CRUD oper
 - Updated services to use latest boot, security and cloud APIs
 
 ### Please Note
-If you intend to save the docker images after build, please enter your username and set your password in the ```.m2/settings.xml``` as described in the Google jib maven documentation.
-
-You may do so by uncommenting this code snippet in the main `pom.xml` file and enter your username (for the docker registry):
-
-`
-<!-- Please change to your username -->
-                    <!--to><image>registry.hub.docker.com/<user-name>/${artifactId}</image></to-->
-`
+The Kubernetes manifests are managed through `k8s/kustomization.yaml`, which rewrites application image tags to `main` for the current deployment flow. If you build with a different `IMAGE_TAG`, update the Kustomize image tags before deploying. Do not commit `k8s/secrets.yaml`; only `k8s/secret-example.yaml` is versioned.
