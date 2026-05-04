@@ -13,6 +13,7 @@ resources:
   - ingress/ingress.yaml
   - ingress/cert-issuer.yaml
   - monitoring/namespace.yaml
+  - monitoring/prometheus-deployment.yaml
   - monitoring/prometheus-config.yaml
   - monitoring/grafana.yaml
 
