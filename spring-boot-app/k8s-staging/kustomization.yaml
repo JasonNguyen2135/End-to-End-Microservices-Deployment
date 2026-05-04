@@ -10,6 +10,12 @@ resources:
   - ecommerce-expansion.yaml
   - services.yaml
   - frontend.yaml
+  - ingress/ingress.yaml
+  - ingress/cert-issuer.yaml
+  - monitoring/namespace.yaml
+  - monitoring/prometheus-deployment.yaml
+  - monitoring/prometheus-config.yaml
+  - monitoring/grafana.yaml
 
 images:
   - name: kaingyn615/product-service
