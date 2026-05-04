@@ -21,7 +21,7 @@ public class CartService {
     public Cart addItem(String userId, CartItem item) {
         Cart cart = getCart(userId);
         Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(i -> i.getProductId().equals(item.getProductId()))
+                .filter(i -> sameItem(i, item))
                 .findFirst();
 
         if (existingItem.isPresent()) {
@@ -30,6 +30,16 @@ public class CartService {
             cart.getItems().add(item);
         }
         return cartRepository.save(cart);
+    }
+
+    private boolean sameItem(CartItem current, CartItem next) {
+        if (current.getProductId() != null && next.getProductId() != null) {
+            return current.getProductId().equals(next.getProductId());
+        }
+        if (current.getSkuCode() != null && next.getSkuCode() != null) {
+            return current.getSkuCode().equalsIgnoreCase(next.getSkuCode());
+        }
+        return current.getName() != null && current.getName().equals(next.getName());
     }
 
     public void clearCart(String userId) {

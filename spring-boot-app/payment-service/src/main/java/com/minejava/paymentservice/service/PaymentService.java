@@ -1,13 +1,20 @@
 package com.minejava.paymentservice.service;
 
 import com.minejava.paymentservice.config.VNPayConfig;
+import com.minejava.paymentservice.dto.OrderItemDto;
+import com.minejava.paymentservice.dto.OrderPaymentItemsResponse;
 import com.minejava.paymentservice.dto.PaymentRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -19,8 +26,11 @@ import java.util.*;
 public class PaymentService {
 
     private final VNPayConfig vnPayConfig;
+    private final WebClient.Builder webClientBuilder;
 
     public String createPayment(PaymentRequest paymentRequest, HttpServletRequest request) throws UnsupportedEncodingException {
+        getPendingOrderItems(paymentRequest.getOrderId());
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_OrderInfo = paymentRequest.getOrderInfo();
@@ -88,5 +98,78 @@ public class PaymentService {
         String paymentUrl = vnPayConfig.vnp_PayUrl + "?" + queryUrl;
         log.info("VNPAY URL GENERATED: {}", paymentUrl);
         return paymentUrl;
+    }
+
+    public List<OrderItemDto> resolveItems(PaymentRequest paymentRequest) {
+        return getPendingOrderItems(paymentRequest.getOrderId());
+    }
+
+    public List<OrderItemDto> getOrderItems(String orderId) {
+        OrderPaymentItemsResponse response = getOrderPaymentItems(orderId);
+        return response.getItems() != null ? response.getItems() : List.of();
+    }
+
+    public List<OrderItemDto> getPendingOrderItems(String orderId) {
+        OrderPaymentItemsResponse response = getOrderPaymentItems(orderId);
+        if (!"PENDING".equals(response.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Order is not pending payment");
+        }
+        return response.getItems() != null ? response.getItems() : List.of();
+    }
+
+    public boolean isValidVnPayCallback(Map<String, String> queryParams) {
+        String receivedHash = queryParams.get("vnp_SecureHash");
+        if (receivedHash == null || receivedHash.isBlank()) {
+            return false;
+        }
+
+        List<String> fieldNames = new ArrayList<>(queryParams.keySet());
+        fieldNames.remove("vnp_SecureHash");
+        fieldNames.remove("vnp_SecureHashType");
+        Collections.sort(fieldNames);
+
+        List<String> encodedPairs = new ArrayList<>();
+        for (String fieldName : fieldNames) {
+            String fieldValue = queryParams.get(fieldName);
+            if (fieldValue != null && !fieldValue.isBlank()) {
+                encodedPairs.add(fieldName + "=" + URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+            }
+        }
+
+        String hashData = String.join("&", encodedPairs);
+        String expectedHash = vnPayConfig.hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
+        return MessageDigest.isEqual(
+                expectedHash.getBytes(StandardCharsets.UTF_8),
+                receivedHash.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private OrderPaymentItemsResponse getOrderPaymentItems(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing order number");
+        }
+
+        try {
+            OrderPaymentItemsResponse response = webClientBuilder.build().get()
+                    .uri("http://order-service:8080/api/order/internal/{orderId}/payment-items", orderId)
+                    .retrieve()
+                    .bodyToMono(OrderPaymentItemsResponse.class)
+                    .block();
+
+            if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Order has no payment items");
+            }
+            return response;
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (WebClientResponseException.Forbidden e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Order is not allowed for payment");
+        } catch (WebClientResponseException.NotFound e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        } catch (WebClientResponseException e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Order service rejected payment lookup");
+        } catch (Exception e) {
+            log.error("Unable to resolve order items for {}: {}", orderId, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Order service is unavailable");
+        }
     }
 }

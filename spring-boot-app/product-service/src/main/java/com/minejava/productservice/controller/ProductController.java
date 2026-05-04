@@ -30,6 +30,12 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponse updateProduct(@PathVariable String id, @RequestBody ProductRequest productRequest) {
+        return productService.updateProduct(id, productRequest);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable String id) {
