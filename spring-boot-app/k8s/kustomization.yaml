@@ -12,7 +12,10 @@ resources:
   - frontend.yaml
   - ingress/ingress.yaml
   - ingress/cert-issuer.yaml
-  - monitoring/prometheus.yaml
+  - monitoring/namespace.yaml
+  - monitoring/prometheus-rbac.yaml
+  - monitoring/prometheus-config.yaml
+  - monitoring/prometheus-deployment.yaml
   - monitoring/grafana.yaml
   - monitoring/alertmanager.yaml
 
