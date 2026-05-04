@@ -10,6 +10,8 @@ resources:
   - ecommerce-expansion.yaml
   - services.yaml
   - frontend.yaml
+  - ingress/ingress.yaml
+  - ingress/cert-issuer.yaml
 
 images:
   - name: kaingyn615/product-service
