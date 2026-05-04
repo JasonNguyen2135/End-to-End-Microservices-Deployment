@@ -35,4 +35,18 @@ public class InventoryController {
         Integer quantity = (Integer) data.get("quantity");
         inventoryService.initInventory(skuCode, quantity);
     }
+
+    @GetMapping("/admin/all")
+    @ResponseStatus(HttpStatus.OK)
+    public List<InventoryResponse> listAll() {
+        return inventoryService.listAll();
+    }
+
+    @PutMapping("/admin/{skuCode}")
+    @ResponseStatus(HttpStatus.OK)
+    public InventoryResponse updateQuantity(@PathVariable String skuCode,
+                                            @RequestBody Map<String, Object> data) {
+        Integer quantity = data.get("quantity") instanceof Number n ? n.intValue() : null;
+        return inventoryService.updateQuantity(skuCode, quantity);
+    }
 }

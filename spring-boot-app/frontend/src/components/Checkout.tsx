@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { paymentService, cartService } from '../services/api';
-import api from '../services/api';
 import { CheckCircle, CreditCard, Landmark, Loader2, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
@@ -12,6 +11,10 @@ const Checkout: React.FC = () => {
     const { orderId, totalAmount, items } = location.state || {};
     const [method, setMethod] = useState<'VNPAY' | 'BANK' | null>(null);
     const [loading, setLoading] = useState(false);
+    const formatVnd = (value: number) => new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(value);
 
     if (!orderId) {
         return <div className="loader">Không tìm thấy thông tin đơn hàng.</div>;
@@ -22,19 +25,19 @@ const Checkout: React.FC = () => {
         try {
             const paymentRequest = {
                 orderId: orderId,
-                amount: totalAmount * 25000,
+                amount: totalAmount,
                 orderInfo: `Thanh toan don hang ${orderId}`,
-                items: items.map((i: any) => ({ skuCode: i.skuCode, quantity: i.quantity }))
+                items: items.map((i: any) => ({ skuCode: i.skuCode, quantity: i.quantity, price: i.price }))
             };
             const response = await paymentService.createPayment(paymentRequest);
             
             // Xóa giỏ hàng trước khi redirect
-            await cartService.clearCart("user123");
+            await cartService.clearCart();
             refreshCartCount();
             
             window.location.href = response.data;
-        } catch (error) {
-            alert("Lỗi khi kết nối VNPay.");
+        } catch (error: any) {
+            alert(error?.response?.data?.message || "Lỗi khi kết nối VNPay.");
             setLoading(false);
         }
     };
@@ -46,18 +49,18 @@ const Checkout: React.FC = () => {
                 orderId: orderId,
                 amount: totalAmount,
                 orderInfo: "Manual Bank Transfer",
-                items: items.map((i: any) => ({ skuCode: i.skuCode, quantity: i.quantity }))
+                items: items.map((i: any) => ({ skuCode: i.skuCode, quantity: i.quantity, price: i.price }))
             };
-            await api.post('/api/payment/manual-confirm', paymentRequest);
+            await paymentService.manualConfirm(paymentRequest);
             
             // Xóa giỏ hàng sau khi xác nhận thành công
-            await cartService.clearCart("user123");
+            await cartService.clearCart();
             refreshCartCount();
             
             navigate('/payment-result?vnp_ResponseCode=00');
-        } catch (error) {
+        } catch (error: any) {
             console.error("Confirm error:", error);
-            alert("Lỗi xác nhận.");
+            alert(error?.response?.data?.message || "Lỗi xác nhận thanh toán.");
             setLoading(false);
         }
     };
@@ -71,7 +74,7 @@ const Checkout: React.FC = () => {
                 <h2 className="section-title">Chọn Phương Thức Thanh Toán</h2>
                 <div className="order-summary-small">
                     <p>Mã đơn hàng: <strong>{orderId}</strong></p>
-                    <p>Tổng tiền: <strong className="price">${totalAmount.toFixed(2)}</strong></p>
+                    <p>Tổng tiền: <strong className="price">{formatVnd(totalAmount)}</strong></p>
                 </div>
 
                 <div className="payment-methods">
@@ -102,8 +105,8 @@ const Checkout: React.FC = () => {
                     <div className="qr-section">
                         <h4>Quét mã VietQR để thanh toán</h4>
                         <div className="qr-code">
-                            <img 
-                                src={`https://img.vietqr.io/image/970422-123456789-compact2.jpg?amount=${totalAmount * 25000}&addInfo=THANH TOAN ${orderId}`} 
+                            <img
+                                src={`https://img.vietqr.io/image/970422-123456789-compact2.jpg?amount=${totalAmount}&addInfo=THANH TOAN ${orderId}`}
                                 alt="VietQR"
                             />
                         </div>
