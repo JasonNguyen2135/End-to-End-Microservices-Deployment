@@ -54,7 +54,7 @@ jobs:
 
       - name: Build Docker image
         if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
-        run: docker build -f api-gateway/Dockerfile -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }} -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }}-${{ github.sha }} api-gateway
+        run: docker build -f api-gateway/Dockerfile -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }} -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }}-${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
