@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # SonarQube cần lịch sử git để phân tích tốt hơn
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
