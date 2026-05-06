@@ -62,7 +62,7 @@ services:
     image: postgres:16
     container_name: postgres
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     environment:
@@ -252,7 +252,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       APP_EUREKA_SERVER: discovery-server
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:password@discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/auth/realms/spring-boot-ms-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/spring-boot-ms-realm
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
     ports:
       - "8085:8080"
