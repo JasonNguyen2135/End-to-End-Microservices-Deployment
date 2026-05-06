@@ -18,23 +18,23 @@ resources:
   - monitoring/grafana.yaml
 
 images:
-  - name: kaingyn615/product-service
+  - name: hiunehihi/product-service
     newTag: dev
-  - name: kaingyn615/cart-service
+  - name: hiunehihi/cart-service
     newTag: dev
-  - name: kaingyn615/payment-service
+  - name: hiunehihi/payment-service
     newTag: dev
-  - name: kaingyn615/discovery-server
+  - name: hiunehihi/discovery-server
     newTag: dev
-  - name: kaingyn615/api-gateway
+  - name: hiunehihi/api-gateway
     newTag: dev
-  - name: kaingyn615/order-service
+  - name: hiunehihi/order-service
     newTag: dev
-  - name: kaingyn615/inventory-service
+  - name: hiunehihi/inventory-service
     newTag: dev
-  - name: kaingyn615/notification-service
+  - name: hiunehihi/notification-service
     newTag: dev
-  - name: kaingyn615/admin-server
+  - name: hiunehihi/admin-server
     newTag: dev
-  - name: kaingyn615/frontend
+  - name: hiunehihi/frontend
     newTag: dev
