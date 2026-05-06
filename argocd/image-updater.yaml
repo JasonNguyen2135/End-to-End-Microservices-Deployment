@@ -17,46 +17,46 @@ spec:
         updateStrategy: digest
       images:
         - alias: product-service
-          imageName: kaingyn615/product-service:main
+          imageName: hiunehihi/product-service:main
         - alias: cart-service
-          imageName: kaingyn615/cart-service:main
+          imageName: hiunehihi/cart-service:main
         - alias: payment-service
-          imageName: kaingyn615/payment-service:main
+          imageName: hiunehihi/payment-service:main
         - alias: discovery-server
-          imageName: kaingyn615/discovery-server:main
+          imageName: hiunehihi/discovery-server:main
         - alias: api-gateway
-          imageName: kaingyn615/api-gateway:main
+          imageName: hiunehihi/api-gateway:main
         - alias: order-service
-          imageName: kaingyn615/order-service:main
+          imageName: hiunehihi/order-service:main
         - alias: inventory-service
-          imageName: kaingyn615/inventory-service:main
+          imageName: hiunehihi/inventory-service:main
         - alias: notification-service
-          imageName: kaingyn615/notification-service:main
+          imageName: hiunehihi/notification-service:main
         - alias: admin-server
-          imageName: kaingyn615/admin-server:main
+          imageName: hiunehihi/admin-server:main
         - alias: frontend
-          imageName: kaingyn615/frontend:main
+          imageName: hiunehihi/frontend:main
     - namePattern: spring-microservices-staging
       commonUpdateSettings:
         updateStrategy: digest
       images:
         - alias: product-service
-          imageName: kaingyn615/product-service:dev
+          imageName: hiunehihi/product-service:dev
         - alias: cart-service
-          imageName: kaingyn615/cart-service:dev
+          imageName: hiunehihi/cart-service:dev
         - alias: payment-service
-          imageName: kaingyn615/payment-service:dev
+          imageName: hiunehihi/payment-service:dev
         - alias: discovery-server
-          imageName: kaingyn615/discovery-server:dev
+          imageName: hiunehihi/discovery-server:dev
         - alias: api-gateway
-          imageName: kaingyn615/api-gateway:dev
+          imageName: hiunehihi/api-gateway:dev
         - alias: order-service
-          imageName: kaingyn615/order-service:dev
+          imageName: hiunehihi/order-service:dev
         - alias: inventory-service
-          imageName: kaingyn615/inventory-service:dev
+          imageName: hiunehihi/inventory-service:dev
         - alias: notification-service
-          imageName: kaingyn615/notification-service:dev
+          imageName: hiunehihi/notification-service:dev
         - alias: admin-server
-          imageName: kaingyn615/admin-server:dev
+          imageName: hiunehihi/admin-server:dev
         - alias: frontend
-          imageName: kaingyn615/frontend:dev
+          imageName: hiunehihi/frontend:dev

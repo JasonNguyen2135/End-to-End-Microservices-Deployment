@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: kaingyn615/product-service:latest
+          image: hiunehihi/product-service:latest
           ports:
             - containerPort: 8080
           env:

@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: discovery-server
-          image: kaingyn615/discovery-server:latest
+          image: hiunehihi/discovery-server:latest
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -67,7 +67,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: kaingyn615/api-gateway:latest
+          image: hiunehihi/api-gateway:latest
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -121,7 +121,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: kaingyn615/order-service:latest
+          image: hiunehihi/order-service:latest
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -162,7 +162,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: kaingyn615/inventory-service:latest
+          image: hiunehihi/inventory-service:latest
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -203,7 +203,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: kaingyn615/notification-service:latest
+          image: hiunehihi/notification-service:latest
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -242,7 +242,7 @@ spec:
     spec:
       containers:
         - name: admin-server
-          image: kaingyn615/admin-server:latest
+          image: hiunehihi/admin-server:latest
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE

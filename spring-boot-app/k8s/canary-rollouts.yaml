@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: kaingyn615/product-service:latest # Image Updater sẽ quản lý tag thực tế
+          image: hiunehihi/product-service:latest # Image Updater sẽ quản lý tag thực tế
           ports:
             - containerPort: 8080
           env:
