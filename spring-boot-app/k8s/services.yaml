@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: discovery-server
-          image: hiunehihi/discovery-server:main
+          image: kaingyn615/discovery-server:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -40,16 +40,17 @@ spec:
           ports:
             - containerPort: 8761
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /actuator/health
               port: 8761
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /actuator/health
               port: 8761
-            initialDelaySeconds: 90
+            initialDelaySeconds: 60
             periodSeconds: 20
-            failureThreshold: 5
           resources:
             requests:
               cpu: 100m
@@ -88,7 +89,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: hiunehihi/api-gateway:latest
+          image: kaingyn615/api-gateway:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -103,7 +104,7 @@ spec:
             - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
               value: TRACE
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: http://keycloak:8080/realms/spring-boot-microservices-realm
+              value: http://keycloak:8080/realms/spring-boot-ms-realm
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -164,7 +165,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: hiunehihi/order-service:latest
+          image: kaingyn615/order-service:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -177,7 +178,7 @@ spec:
             - name: EUREKA_INSTANCE_HOSTNAME
               value: order-service
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres-order:5431/order-service
+              value: jdbc:postgresql://postgres-order:5432/order-service
             - name: SPRING_DATASOURCE_USERNAME
               value: ptechie
             - name: SPRING_DATASOURCE_PASSWORD
@@ -185,6 +186,8 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: postgres-order-password
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: broker:29092
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -234,7 +237,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: hiunehihi/inventory-service:latest
+          image: kaingyn615/inventory-service:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -255,6 +258,8 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: postgres-inventory-password
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: broker:29092
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -304,7 +309,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: hiunehihi/notification-service:latest
+          image: kaingyn615/notification-service:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -365,7 +370,7 @@ spec:
     spec:
       containers:
         - name: admin-server
-          image: hiunehihi/admin-server:latest
+          image: kaingyn615/admin-server:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
