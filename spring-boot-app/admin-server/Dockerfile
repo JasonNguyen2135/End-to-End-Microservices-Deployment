@@ -6,7 +6,7 @@ COPY pom.xml pom.xml
 COPY admin-server/pom.xml admin-server/pom.xml
 COPY admin-server/src admin-server/src
 
-RUN mvn -f admin-server/pom.xml clean package -DskipTests
+RUN mvn -f admin-server/pom.xml clean package spring-boot:repackage -DskipTests
 
 # Run stage
 FROM amazoncorretto:17-alpine-jdk
