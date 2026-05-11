@@ -107,17 +107,16 @@ spec:
           ports:
             - containerPort: 8080
           readinessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 45
+            initialDelaySeconds: 60
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 20
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            failureThreshold: 5
           resources:
             requests:
               cpu: 150m
@@ -190,17 +189,16 @@ spec:
           ports:
             - containerPort: 8080
           readinessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 45
+            initialDelaySeconds: 60
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 20
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            failureThreshold: 5
           resources:
             requests:
               cpu: 150m
@@ -262,17 +260,16 @@ spec:
           ports:
             - containerPort: 8080
           readinessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 45
+            initialDelaySeconds: 60
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 20
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            failureThreshold: 5
           resources:
             requests:
               cpu: 150m
@@ -323,17 +320,16 @@ spec:
           ports:
             - containerPort: 8080
           readinessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 45
+            initialDelaySeconds: 60
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 20
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            failureThreshold: 5
           resources:
             requests:
               cpu: 100m
@@ -384,17 +380,16 @@ spec:
           ports:
             - containerPort: 8080
           readinessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 45
+            initialDelaySeconds: 60
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /actuator/health
+            tcpSocket:
               port: 8080
-            initialDelaySeconds: 90
-            periodSeconds: 20
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            failureThreshold: 5
           resources:
             requests:
               cpu: 100m
