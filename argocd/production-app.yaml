@@ -47,7 +47,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/davidmoi2135/End-to-End-Microservices-Deployment.git
-    targetRevision: main
+    targetRevision: feature/web-ecommerce
     path: spring-boot-app/k8s
   destination:
     server: https://kubernetes.default.svc
