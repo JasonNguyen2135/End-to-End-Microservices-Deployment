@@ -3,11 +3,51 @@ kind: Application
 metadata:
   name: spring-microservices
   namespace: argocd
+  annotations:
+    # === ArgoCD Image Updater ===
+    argocd-image-updater.argoproj.io/image-list: >-
+      product=hiunehihi/product-service,
+      cart=hiunehihi/cart-service,
+      payment=hiunehihi/payment-service,
+      discovery=hiunehihi/discovery-server,
+      gateway=hiunehihi/api-gateway,
+      order=hiunehihi/order-service,
+      inventory=hiunehihi/inventory-service,
+      notification=hiunehihi/notification-service,
+      admin=hiunehihi/admin-server,
+      frontend=hiunehihi/frontend
+    argocd-image-updater.argoproj.io/product.update-strategy: digest
+    argocd-image-updater.argoproj.io/product.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/cart.update-strategy: digest
+    argocd-image-updater.argoproj.io/cart.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/payment.update-strategy: digest
+    argocd-image-updater.argoproj.io/payment.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/discovery.update-strategy: digest
+    argocd-image-updater.argoproj.io/discovery.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/gateway.update-strategy: digest
+    argocd-image-updater.argoproj.io/gateway.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/order.update-strategy: digest
+    argocd-image-updater.argoproj.io/order.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/inventory.update-strategy: digest
+    argocd-image-updater.argoproj.io/inventory.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/notification.update-strategy: digest
+    argocd-image-updater.argoproj.io/notification.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/admin.update-strategy: digest
+    argocd-image-updater.argoproj.io/admin.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/frontend.update-strategy: digest
+    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^main$
+    argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
+    argocd-image-updater.argoproj.io/write-back-target: kustomization:spring-boot-app/k8s
+    argocd-image-updater.argoproj.io/git-branch: feature/web-ecommerce
+    # === Slack notification subscriptions ===
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: deployments
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: deployments
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: deployments
 spec:
   project: default
   source:
     repoURL: https://github.com/davidmoi2135/End-to-End-Microservices-Deployment.git
-    targetRevision: main
+    targetRevision: feature/web-ecommerce
     path: spring-boot-app/k8s
   destination:
     server: https://kubernetes.default.svc
@@ -18,3 +58,10 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10

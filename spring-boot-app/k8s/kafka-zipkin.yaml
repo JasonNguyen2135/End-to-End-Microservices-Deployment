@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: zookeeper
   namespace: spring-microservices
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   ports:
     - port: 2181
@@ -14,6 +16,8 @@ kind: Deployment
 metadata:
   name: zookeeper
   namespace: spring-microservices
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   selector:
     matchLabels:
@@ -56,6 +60,8 @@ kind: Service
 metadata:
   name: broker
   namespace: spring-microservices
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   ports:
     - port: 9092
@@ -67,6 +73,8 @@ kind: Deployment
 metadata:
   name: broker
   namespace: spring-microservices
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   selector:
     matchLabels:
@@ -119,6 +127,8 @@ kind: Service
 metadata:
   name: zipkin
   namespace: spring-microservices
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   ports:
     - port: 9411
@@ -130,6 +140,8 @@ kind: Deployment
 metadata:
   name: zipkin
   namespace: spring-microservices
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   selector:
     matchLabels:
