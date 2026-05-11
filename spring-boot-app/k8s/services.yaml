@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: discovery-server
-          image: kaingyn615/discovery-server:main
+          image: hiunehihi/discovery-server:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -40,16 +40,17 @@ spec:
           ports:
             - containerPort: 8761
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /actuator/health
               port: 8761
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /actuator/health
               port: 8761
-            initialDelaySeconds: 90
+            initialDelaySeconds: 60
             periodSeconds: 20
-            failureThreshold: 5
           resources:
             requests:
               cpu: 100m
@@ -88,7 +89,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: kaingyn615/api-gateway:main
+          image: hiunehihi/api-gateway:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -164,7 +165,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: kaingyn615/order-service:main
+          image: hiunehihi/order-service:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -177,7 +178,7 @@ spec:
             - name: EUREKA_INSTANCE_HOSTNAME
               value: order-service
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres-order:5432/order-service
+              value: jdbc:postgresql://postgres-order:5431/order-service
             - name: SPRING_DATASOURCE_USERNAME
               value: ptechie
             - name: SPRING_DATASOURCE_PASSWORD
@@ -236,7 +237,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: kaingyn615/inventory-service:main
+          image: hiunehihi/inventory-service:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -308,7 +309,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: kaingyn615/notification-service:main
+          image: hiunehihi/notification-service:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -369,7 +370,7 @@ spec:
     spec:
       containers:
         - name: admin-server
-          image: kaingyn615/admin-server:main
+          image: hiunehihi/admin-server:main
           imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
