@@ -16,30 +16,30 @@ jobs:
 
     defaults:
       run:
-        working-directory: spring-boot-app/api-gateway
+        working-directory: spring-boot-app
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # SonarQube cần lịch sử git để phân tích tốt hơn
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
 
       - name: Cache SonarQube packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Build
-        run: mvn clean verify -DskipTests
+        run: mvn clean verify -DskipTests -pl api-gateway -am
 
       - name: SonarQube Scan
         if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
@@ -54,7 +54,7 @@ jobs:
 
       - name: Build Docker image
         if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
-        run: docker build -f Dockerfile -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }} -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }}-${{ github.sha }} ..
+        run: docker build -f api-gateway/Dockerfile -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }} -t ${{ env.DOCKER_USERNAME }}/api-gateway:${{ github.ref_name }}-${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''

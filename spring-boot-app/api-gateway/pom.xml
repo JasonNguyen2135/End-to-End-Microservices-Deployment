@@ -6,6 +6,7 @@
         <groupId>org.minejava</groupId>
         <artifactId>ms-kafka-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
