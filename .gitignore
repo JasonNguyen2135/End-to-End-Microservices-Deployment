@@ -23,6 +23,8 @@ crash.*.log
 *.tfvars.json
 spring-boot-app/k8s/secrets.yaml
 spring-boot-app/k8s-staging/secrets.yaml
+argocd/notifications-secret.yaml
+argocd/git-creds-secret.yaml
 
 # Bỏ qua file ghi đè cấu hình cục bộ
 override.tf
