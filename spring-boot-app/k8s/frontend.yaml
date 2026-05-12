@@ -28,8 +28,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: hiunehihi/frontend:main-633c6f008562ca423fe28e8be42f1e847ee9ec4d
-          imagePullPolicy: IfNotPresent
+          image: hiunehihi/frontend:main
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           readinessProbe:
