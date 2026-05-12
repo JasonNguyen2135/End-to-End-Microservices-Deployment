@@ -19,22 +19,22 @@ resources:
   - monitoring/alertmanager.yaml
 images:
   - name: hiunehihi/product-service
-    digest: sha256:13fd90e7616c22d1d8de78d67c0f73cabcc823c5a79745ce8a1bbe3a890b1643
+    digest: sha256:738b196562a7cd8d0caf4d80749505a16c69f28a007cc699f6691c2efff1ddaf
   - name: hiunehihi/cart-service
-    digest: sha256:a84b2da1cefe5e312dbad83b042edd797a2dad71228a2cd81c2e908aa31f55bf
+    digest: sha256:d6c4af8688d1e1b1592508f33157828bdd6a239ee3200b74f465b2f04f6b4f18
   - name: hiunehihi/payment-service
-    digest: sha256:22f42dd7b340562caad02a060d88d03f726f9b112ddf4f8a6f0357126e58d118
+    digest: sha256:067f0d79536d7c8d476bf800b9145e35d3b065daaad6a049061eb7cbc9e9ce7e
   - name: hiunehihi/discovery-server
-    digest: sha256:5c0d5e5f9ee2c8f8303cde75a436e10fa9edfe88c9f321b23cffec959ca533f8
+    digest: sha256:8256430c599a300b1a4b052d8bc6258ea13b31d3d6f5cb278697c5b4fa18b7cd
   - name: hiunehihi/api-gateway
-    digest: sha256:da496e9a6cd91524b2f2a6e6129db30fef42f34734a5281fe43cfae1b80e581f
+    digest: sha256:4d6f06a34b00d95c48a1ddff070e7f9c291807eb34e924edc979e7eb5f07c7c6
   - name: hiunehihi/order-service
-    digest: sha256:46dd048b0b9f2a2a41a830dcd9367f2f4d2d24a21425e18a8f5d94f65df822cc
+    digest: sha256:2f914be8ad9796041f580fdd29e7dd8332391fd1f18549cd188295d75e57d8f7
   - name: hiunehihi/inventory-service
-    digest: sha256:3d0ba053d4cd122aca0dee62326fe51923f28bad940f03cee50eeb0c008c2794
+    digest: sha256:caeb1d215f7cfe1a06da3e8dee68cb4709a34e489289ccfd0f4531050096012a
   - name: hiunehihi/notification-service
     digest: sha256:0e10ab8461e2bb7bb44ece8ed27e683f86037ca6c7d5084bca0dcd851bcd1e7e
   - name: hiunehihi/admin-server
-    digest: sha256:aa180a5ca4be265cb4716fb267d76707aabf87165fac9114d275113ef79c2e23
+    digest: sha256:7eec4929b6abecee63bb67ecb2cd90dafc62e588e2642e621089bf995dd345da
   - name: hiunehihi/frontend
-    digest: sha256:42a1927ecf89ae4ee74dca60ab6f3b9029c900d3fcd8ad185885cab2fd7ea3c3
+    digest: sha256:7a7655f55cd8c122a929a3dcdf56a70d77476246566dd5216902297620c6d8fb
