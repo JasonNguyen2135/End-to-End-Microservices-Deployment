@@ -1,6 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 resources:
   - namespace.yaml
   - databases.yaml
@@ -18,25 +17,24 @@ resources:
   - monitoring/prometheus-deployment.yaml
   - monitoring/grafana.yaml
   - monitoring/alertmanager.yaml
-
 images:
   - name: hiunehihi/product-service
-    newTag: main
+    digest: sha256:2ff99d7675f9aa7e43a39c204388a1a031cbc4ac9f36377a358c9ad955dfd593
   - name: hiunehihi/cart-service
-    newTag: main
+    digest: sha256:883f5d4a80e72771439b72d8513b06cda0292a8345498d017582f2cea401695a
   - name: hiunehihi/payment-service
-    newTag: main
+    digest: sha256:92f83124fb707dc36798f3a0f5029348aa104f6576f2d9ba712c15bdd0a594ca
   - name: hiunehihi/discovery-server
     newTag: main
   - name: hiunehihi/api-gateway
-    newTag: main
+    digest: sha256:5e4f49e35e01feb34e4e34ef4fc77ca116f6e0cd015b998b0859c0209fa49e7b
   - name: hiunehihi/order-service
-    newTag: main
+    digest: sha256:4fea828dedee24c10edf6e275293833a16ca7818fa3a09d5d5c9a4b70752ac17
   - name: hiunehihi/inventory-service
-    newTag: main
+    digest: sha256:e9ec454b43a417d13fa97947e797ccf2db6e8b371b21e26f8e904a6593c9d538
   - name: hiunehihi/notification-service
-    newTag: main
+    digest: sha256:54f28b76ca979efa101cbdde32b0b5ff3b32cf2cd393609ee7d074299d451572
   - name: hiunehihi/admin-server
-    newTag: main
+    digest: sha256:b53a0f960031649c18dadccfb93e5965f6c2c2e534b3d6f172777ec10544ddf4
   - name: hiunehihi/frontend
-    newTag: main
+    digest: sha256:2a0bf1444db5ebeb755b266dd349bafbe4334536060db75786f5e149059d3cfc
