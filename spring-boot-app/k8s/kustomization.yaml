@@ -39,4 +39,4 @@ images:
   - name: hiunehihi/admin-server
     newTag: main
   - name: hiunehihi/frontend
-    newTag: main
+    newTag: main-633c6f008562ca423fe28e8be42f1e847ee9ec4d
