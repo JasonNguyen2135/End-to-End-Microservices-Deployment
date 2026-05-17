@@ -11,6 +11,9 @@ import {
 const getApiBaseUrl = () => {
     const configured = process.env.REACT_APP_API_BASE_URL;
     if (configured) return configured;
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        return `${window.location.protocol}//${window.location.hostname}:30085`;
+    }
     return 'http://localhost:30085';
 };
 
